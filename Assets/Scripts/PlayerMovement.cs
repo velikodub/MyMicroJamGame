@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Feel")]
     [SerializeField] private float coyoteTime = 0.15f;
     [SerializeField] private float jumpBufferTime = 0.15f;
+    [SerializeField] private float minFallSpeedForSound = 1f;
 
     [Header("Detection")]
     [SerializeField] private Transform groundCheck;
@@ -30,6 +31,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float coyoteTimeCounter;
     private float jumpBufferCounter;
+    private float lastVerticalVelocity;
 
     private bool isFacingRight = true;
     private RobotSounds sounds;
@@ -65,7 +67,10 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = Physics2D.OverlapBox(groundCheck.position, checkBoxSize, 0f, groundLayer);
         if (isGrounded && !wasGrounded)
         {
-            sounds.PlayLand();
+            if(lastVerticalVelocity < -minFallSpeedForSound)
+            {
+                sounds.PlayLand();
+            }
             coyoteTimeCounter = coyoteTime;
         }
         wasGrounded = isGrounded;
@@ -98,6 +103,7 @@ public class PlayerMovement : MonoBehaviour
     }
     private void FixedUpdate()
     {
+        lastVerticalVelocity = rb.linearVelocity.y;
         ApplyMovement();
         ApplyBetterFall();
     }

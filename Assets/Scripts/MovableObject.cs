@@ -56,6 +56,11 @@ public class MovableObject : MonoBehaviour
             }
         }
     }
+    public void MoveByButton(Vector3 to)
+    {
+        targetPos = to;
+        Active();
+    }
     public void Active()
     {
         isActivated = !isActivated;

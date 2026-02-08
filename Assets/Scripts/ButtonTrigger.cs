@@ -3,6 +3,8 @@ using UnityEngine;
 public class ButtonTrigger : MonoBehaviour
 {
     [SerializeField] private MovableObject linkedObject;
+    [SerializeField] private bool moveByBotton;
+    [SerializeField] private Vector3 moveOffset;
 
     private bool playerNearby = false;
 
@@ -12,7 +14,14 @@ public class ButtonTrigger : MonoBehaviour
         {
             if(linkedObject != null)
             {
-                linkedObject.Active();
+                if (moveByBotton)
+                {
+                    linkedObject.MoveByButton(moveOffset);
+                }
+                else
+                {
+                    linkedObject.Active();
+                }
                 Debug.Log("Button Pressed!");
             }
         }

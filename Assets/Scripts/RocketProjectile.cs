@@ -11,7 +11,7 @@ public class RocketProjectile : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        if(!collision.CompareTag("Player") && !collision.CompareTag("Trap"))
+        if(!collision.CompareTag("Player"))
         {
             Destroy(gameObject);
             return;
