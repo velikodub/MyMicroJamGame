@@ -59,25 +59,28 @@ public class PlayerMovement : MonoBehaviour
         {
             Flip();
         }
-        else if(horizontalInput < 0 & isFacingRight)
+        else if(horizontalInput < 0 && isFacingRight)
         {
             Flip();
         }
 
         isGrounded = Physics2D.OverlapBox(groundCheck.position, checkBoxSize, 0f, groundLayer);
-        if (isGrounded && !wasGrounded)
+        if (isGrounded)
         {
-            if(lastVerticalVelocity < -minFallSpeedForSound)
-            {
-                sounds.PlayLand();
-            }
             coyoteTimeCounter = coyoteTime;
         }
-        wasGrounded = isGrounded;
-        if (!isGrounded)
+        else
         {
             coyoteTimeCounter -= Time.deltaTime;
         }
+        if (isGrounded && !wasGrounded)
+        {
+            if (lastVerticalVelocity < -minFallSpeedForSound)
+            {
+                sounds.PlayLand();
+            }
+        }
+        wasGrounded = isGrounded;
 
         if (Input.GetButtonDown("Jump")) {
             jumpBufferCounter = jumpBufferTime;
@@ -104,6 +107,7 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         lastVerticalVelocity = rb.linearVelocity.y;
+
         ApplyMovement();
         ApplyBetterFall();
     }
@@ -111,6 +115,7 @@ public class PlayerMovement : MonoBehaviour
     {
         float targetSpeed = horizontalInput * moveSpeed;
         float speedDif = targetSpeed - rb.linearVelocity.x;
+
         float accelRat = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
         float movement = speedDif * accelRat;
 
@@ -149,7 +154,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (groundCheck != null)
         {
-            Gizmos.color = Color.red;
+            Gizmos.color = isGrounded ? Color.green : Color.red;
             Gizmos.DrawWireCube(groundCheck.position, checkBoxSize);
         }
     }

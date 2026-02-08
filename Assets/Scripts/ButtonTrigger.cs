@@ -1,10 +1,9 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class ButtonTrigger : MonoBehaviour
 {
-    [SerializeField] private MovableObject linkedObject;
-    [SerializeField] private bool moveByBotton;
-    [SerializeField] private Vector3 moveOffset;
+    [SerializeField] private Block[] blocks;
 
     private bool playerNearby = false;
 
@@ -12,17 +11,23 @@ public class ButtonTrigger : MonoBehaviour
     {
         if(playerNearby && Input.GetKeyDown(KeyCode.E))
         {
-            if(linkedObject != null)
+            Move();
+        }
+    }
+    private void Move()
+    {
+        foreach(var block in blocks)
+        {
+            if (block.Script != null)
             {
-                if (moveByBotton)
+                if (block.isToward)
                 {
-                    linkedObject.MoveByButton(moveOffset);
+                    block.Script.MoveTowards(block.Towards);
                 }
                 else
                 {
-                    linkedObject.Active();
+                    block.Script.MoveOffset(block.Offset);
                 }
-                Debug.Log("Button Pressed!");
             }
         }
     }
@@ -40,4 +45,12 @@ public class ButtonTrigger : MonoBehaviour
             playerNearby = false;
         }
     }
+}
+[System.Serializable]
+public struct Block
+{
+    public MovableObject Script;
+    public Vector3 Offset;
+    public Vector3 Towards;
+    public bool isToward;
 }

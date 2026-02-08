@@ -30,7 +30,6 @@ public class MovableObject : MonoBehaviour
     private void Start()
     {
         startPos = transform.position;
-        targetPos = startPos + moveOffset;
         if (moveSound != null)
         {
             audioSource.clip = moveSound;
@@ -38,10 +37,13 @@ public class MovableObject : MonoBehaviour
     }
     private void Update()
     {
-        Vector3 dest = isActivated ? targetPos : startPos;
-        transform.position = Vector3.MoveTowards(transform.position, dest, speed * Time.deltaTime);
+        if (!isActivated)
+        {
+            targetPos = startPos;
+        }
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
 
-        if (Vector3.Distance(transform.position, dest) > 0.01f)
+        if (Vector3.Distance(transform.position, targetPos) > 0.01f)
         {
             if (!audioSource.isPlaying)
             {
@@ -56,12 +58,17 @@ public class MovableObject : MonoBehaviour
             }
         }
     }
-    public void MoveByButton(Vector3 to)
+    public void MoveTowards(Vector3 to)
     {
         targetPos = to;
         Active();
     }
-    public void Active()
+    public void MoveOffset(Vector3 offset)
+    {
+        targetPos = startPos + offset;
+        Active();
+    }
+    private void Active()
     {
         isActivated = !isActivated;
     }

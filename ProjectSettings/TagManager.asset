@@ -44,5 +44,11 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Player
+    uniqueID: 2428174011
+    locked: 0
+  - name: EchoRoot
+    uniqueID: 287765157
+    locked: 0
   m_RenderingLayers:
   - Default

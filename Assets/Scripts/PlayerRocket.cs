@@ -29,6 +29,11 @@ public class PlayerRocket : MonoBehaviour
     public void PickUpRocket()
     {
         hasRocket = true;
+        RobotSounds robotSounds = gameObject.GetComponent<RobotSounds>();
+        if (robotSounds)
+        {
+            robotSounds.PickUp();
+        }
         Debug.Log("Rocket Acquired!");
     }
 }

@@ -9,6 +9,7 @@ public class RobotSounds : MonoBehaviour
     [SerializeField] private AudioClip scanSound;
     [SerializeField] private AudioClip moveSound;
     [SerializeField] private AudioClip explodeSound;
+    [SerializeField] private AudioClip equipSound;
     [Header("AudioSources")]
     [SerializeField] private AudioSource mainSource;
     [SerializeField] private AudioSource moveSource;
@@ -50,5 +51,9 @@ public class RobotSounds : MonoBehaviour
     public void PlayExplosion(Vector3 position)
     {
         AudioSource.PlayClipAtPoint(explodeSound, position);
+    }
+    public void PickUp()
+    {
+        mainSource.PlayOneShot(equipSound);
     }
 }
