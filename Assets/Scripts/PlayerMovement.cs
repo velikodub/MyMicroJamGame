@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
@@ -19,30 +20,56 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Detection")]
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private float checkRadius = 0.1f;
+    [SerializeField] private Vector2 checkBoxSize = new Vector2(0.8f, 0.2f);
     [SerializeField] private LayerMask groundLayer;
 
     private Rigidbody2D rb;
     private float horizontalInput;
     private bool isGrounded;
+    private bool wasGrounded;
 
     private float coyoteTimeCounter;
     private float jumpBufferCounter;
 
+    private bool isFacingRight = true;
+    private RobotSounds sounds;
+    private EchoPulse pulse;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        sounds = GetComponent<RobotSounds>();
+        pulse = GetComponent<EchoPulse>();
     }
     private void Update()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-        if (isGrounded)
+        if (Input.GetKeyDown(KeyCode.O))
         {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            sounds.PlayScan();
+            pulse.EmitWave();
+        }
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        if(horizontalInput > 0 && !isFacingRight)
+        {
+            Flip();
+        }
+        else if(horizontalInput < 0 & isFacingRight)
+        {
+            Flip();
+        }
+
+        isGrounded = Physics2D.OverlapBox(groundCheck.position, checkBoxSize, 0f, groundLayer);
+        if (isGrounded && !wasGrounded)
+        {
+            sounds.PlayLand();
             coyoteTimeCounter = coyoteTime;
         }
-        else
+        wasGrounded = isGrounded;
+        if (!isGrounded)
         {
             coyoteTimeCounter -= Time.deltaTime;
         }
@@ -58,6 +85,15 @@ public class PlayerMovement : MonoBehaviour
         if(jumpBufferCounter > 0f && coyoteTimeCounter > 0f)
         {
             ExecuteJump();
+        }
+
+        if (Mathf.Abs(horizontalInput) > 0.01f && isGrounded)
+        {
+            sounds.SetMoving(true);
+        }
+        else
+        {
+            sounds.SetMoving(false);
         }
     }
     private void FixedUpdate()
@@ -76,9 +112,9 @@ public class PlayerMovement : MonoBehaviour
     }
     private void ExecuteJump()
     {
+        sounds.PlayJump();
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-
         jumpBufferCounter = 0f;
         coyoteTimeCounter = 0f;
     }
@@ -91,6 +127,24 @@ public class PlayerMovement : MonoBehaviour
         else if(rb.linearVelocity.y > 0 && !Input.GetButton("Jump"))
         {
             rb.linearVelocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.fixedDeltaTime;
+        }
+    }
+    private void Flip()
+    {
+        isFacingRight = !isFacingRight;
+
+        Vector3 scaler = transform.localScale;
+
+        scaler.x *= -1;
+
+        transform.localScale = scaler;
+    }
+    private void OnDrawGizmos()
+    {
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(groundCheck.position, checkBoxSize);
         }
     }
 }
